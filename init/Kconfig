@@ -2298,6 +2298,14 @@ config ASN1
 
 source "kernel/Kconfig.locks"
 
+config PROCFS_MOUNT
+	bool "Ask kernel to mount /proc before user init program"
+	default n
+	help
+	  Some program loaders assume the existence of /proc file system.
+	  Use this option to ask kernel to mount /proc before the very first
+	  user init program.
+
 config ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE
 	bool
 

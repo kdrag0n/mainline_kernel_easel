@@ -96,6 +96,8 @@
 #include <linux/jump_label.h>
 #include <linux/mem_encrypt.h>
 #include <linux/kcsan.h>
+#include <linux/mount.h>
+#include <uapi/linux/mount.h>
 
 #include <asm/io.h>
 #include <asm/bugs.h>
@@ -1470,6 +1472,7 @@ void console_on_rootfs(void)
 
 static noinline void __init kernel_init_freeable(void)
 {
+	int err;
 	/*
 	 * Wait until kthreadd is all set-up.
 	 */
@@ -1519,6 +1522,15 @@ static noinline void __init kernel_init_freeable(void)
 		ramdisk_execute_command = NULL;
 		prepare_namespace();
 	}
+
+#if defined CONFIG_PROCFS_MOUNT
+	/* Mount proc before user's init program */
+	err = do_mount("proc", "/proc", "proc", MS_SILENT, NULL);
+	if (err)
+		pr_info("proc: error mounting %i\n", err);
+	else
+		pr_info("proc: mounted\n");
+#endif
 
 	/*
 	 * Ok, we have completed the initial bootup, and
