@@ -357,6 +357,7 @@
 #define OUTPUT_POOL_SHIFT	10
 #define OUTPUT_POOL_WORDS	(1 << (OUTPUT_POOL_SHIFT-5))
 #define EXTRACT_SIZE		10
+#define ENTROPY_GEN_INTVL_NS	(1 * NSEC_PER_MSEC)
 
 
 #define LONGS(x) (((x) + sizeof(unsigned long) - 1)/sizeof(unsigned long))
@@ -441,6 +442,8 @@ static struct fasync_struct *fasync;
 
 static DEFINE_SPINLOCK(random_ready_list_lock);
 static LIST_HEAD(random_ready_list);
+
+static struct hrtimer entropy_gen_hrtimer;
 
 struct crng_state {
 	__u32		state[16];
@@ -2327,3 +2330,47 @@ void add_bootloader_randomness(const void *buf, unsigned int size)
 		add_device_randomness(buf, size);
 }
 EXPORT_SYMBOL_GPL(add_bootloader_randomness);
+
+/*
+ * Generate entropy on init using high-res timers. Although high-res timers
+ * provide nanosecond precision, they don't actually honor requests to the
+ * nanosecond. The skew between the expected time difference in nanoseconds and
+ * the actual time difference can be used as a way to generate entropy on boot
+ * for machines that lack sufficient boot-time entropy.
+ */
+static enum hrtimer_restart entropy_timer_cb(struct hrtimer *timer)
+{
+	static u64 prev_ns;
+	u64 curr_ns, delta;
+
+	if (crng_ready())
+		return HRTIMER_NORESTART;
+
+	curr_ns = ktime_get_mono_fast_ns();
+	delta = curr_ns - prev_ns;
+
+	add_interrupt_randomness(delta, 0);
+
+	/* Use the hrtimer skew to make the next interval more unpredictable */
+	if (likely(prev_ns))
+		hrtimer_add_expires_ns(timer, delta);
+	else
+		hrtimer_add_expires_ns(timer, ENTROPY_GEN_INTVL_NS);
+
+	prev_ns = curr_ns;
+	return HRTIMER_RESTART;
+}
+
+static int entropy_gen_hrtimer_init(void)
+{
+	if (!IS_ENABLED(CONFIG_HIGH_RES_TIMERS))
+		return 0;
+
+	hrtimer_init(&entropy_gen_hrtimer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
+
+	entropy_gen_hrtimer.function = entropy_timer_cb;
+	hrtimer_start(&entropy_gen_hrtimer, ns_to_ktime(ENTROPY_GEN_INTVL_NS),
+		HRTIMER_MODE_REL);
+	return 0;
+}
+core_initcall(entropy_gen_hrtimer_init);
