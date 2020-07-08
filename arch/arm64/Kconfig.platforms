@@ -299,4 +299,9 @@ config ARCH_ZYNQMP
 	help
 	  This enables support for Xilinx ZynqMP Family
 
+config ARCH_MNH
+	bool "Intel Monette Hill"
+	select ARM_GIC
+	select ARM_GIC_V3
+
 endmenu
