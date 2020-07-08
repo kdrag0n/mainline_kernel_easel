@@ -1,0 +1,114 @@
+/*
+ * ARM Ltd. Juno Platform
+ *
+ * Copyright (c) 2015 ARM Ltd.
+ *
+ * This file is licensed under a dual GPLv2 or BSD license.
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+
+/ {
+	model = "Monette Hill";
+	compatible = "intel,mnh";
+	interrupt-parent = <&gic>;
+	#address-cells = <2>;
+	#size-cells = <2>;
+
+	aliases {
+		serial0 = &soc_uart0;
+	};
+
+	chosen {
+		bootargs = "loglevel=4 clocksource=apb_clocksource swiotlb=4096 console=ttyS0,115200n8 earlycon=uart8250,mmio32,0x04049000";
+		linux,initrd-start = <0x40890040>;
+		linux,initrd-end = <0x41C90000>;
+		stdout-path = "serial0:115200n8";
+		emulation = <0x00000000>;
+		wafer_upper = <0x00000000>;
+		wafer_lower = <0x00000000>;
+	};
+
+	psci {
+		compatible = "arm,psci-1.0";
+		method = "smc";
+	};
+
+	cpus {
+		#address-cells = <2>;
+		#size-cells = <0>;
+
+		cpu-map {
+			cluster0 {
+				core0 {
+					cpu = <&A53_0>;
+				};
+			};
+		};
+
+		idle-states {
+			entry-method = "psci";
+
+			CPU_SLEEP_0: cpu-sleep-0 {
+				compatible = "arm,idle-state";
+				arm,psci-suspend-param = <0x0010000>;
+				local-timer-stop;
+				entry-latency-us = <300>;
+				exit-latency-us = <1200>;
+				min-residency-us = <2000>;
+			};
+
+			CLUSTER_SLEEP_0: cluster-sleep-0 {
+				compatible = "arm,idle-state";
+				arm,psci-suspend-param = <0x1010000>;
+				local-timer-stop;
+				entry-latency-us = <300>;
+				exit-latency-us = <1200>;
+				min-residency-us = <2500>;
+			};
+		};
+
+		A53_0: cpu@0 {
+			compatible = "arm,cortex-a53","arm,armv8";
+			reg = <0x0 0x0>;
+			device_type = "cpu";
+			next-level-cache = <&A53_L2>;
+			enable-method = "psci";
+			cpu-idle-states = <&CPU_SLEEP_0 &CLUSTER_SLEEP_0>;
+		};
+
+		A53_L2: l2-cache1 {
+			compatible = "cache";
+		};
+	};
+
+	pmu_a53 {
+		compatible = "arm,cortex-a53-pmu";
+		interrupts = <GIC_SPI 18 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-affinity = <&A53_0>;
+
+	};
+
+	gic: interrupt-controller@0,04100000 {
+		compatible = "arm,gic-v3";
+		#interrupt-cells = <3>;
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+		interrupt-controller;
+		reg =	<0x0 0x04100000 0x0 0x10000>,
+			<0x0 0x04140000 0x0 0x20000>;
+		interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+
+		its: its@0,04120000 {
+			compatible = "arm,gic-v3-its";
+			msi-controller;
+			#msi-cells = <1>;
+			reg = <0x0 0x04120000 0x0 0x10000>;
+		};
+	};
+	#include "mnh-fwcfg.dtsi"
+	#include "mnh-base.dtsi"
+};

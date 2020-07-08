@@ -1,0 +1,14 @@
+/*
+ * ARM Juno Platform clocks
+ *
+ * Copyright (c) 2013-2014 ARM Ltd
+ *
+ * This file is licensed under a dual GPLv2 or BSD license.
+ *
+ */
+        soc_refclk100mhz: refclk100mhz {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency = <100000000>;
+                clock-output-names = "apb_pclk";
+        };

@@ -1,0 +1,249 @@
+firmware_config {
+	compatible = "intel,mnh_fwcfg";
+	status = "okay";
+	/* uncomment or add entries and customize the cfg value */
+	/*
+	gpio@0 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <36>;
+		cfg = <0x0>;
+	};
+	gpio@1 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <37>;
+		cfg = <0x0>;
+	};
+	gpio@2 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <38>;
+		cfg = <0x0>;
+	};
+	gpio@3 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <39>;
+		cfg = <0x0>;
+	};
+	gpio@4 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <40>;
+		cfg = <0x0>;
+	};
+	gpio@5 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <41>;
+		cfg = <0x0>;
+	};
+	gpio@6 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <42>;
+		cfg = <0x0>;
+	};
+	gpio@7 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <43>;
+		cfg = <0x0>;
+	};
+	gpio@8 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <23>;
+		cfg = <0x0>;
+	};
+	*/
+	gpio@9 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <24>;
+		cfg = <0x18>;
+	};
+	/*
+	gpio@10 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <25>;
+		cfg = <0x0>;
+	};
+	gpio@11 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <26>;
+		cfg = <0x0>;
+	};
+	gpio@12 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <27>;
+		cfg = <0x0>;
+	};
+	gpio@13 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <28>;
+		cfg = <0x0>;
+	};
+	gpio@14 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <29>;
+		cfg = <0x0>;
+	};
+	gpio@15 {
+		compatible = "intel,mnh_cfg_pin";
+		pin = <30>;
+		cfg = <0x0>;
+	};
+	*/
+
+	/* dtnode and dtprop are where to put the value
+	extracted from the efuse data */
+	pll_valid {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "pll_valid";
+			row1    = <0>;
+			row2    = <1>;
+			bit_high= <30>;
+			bit_low = <30>;
+	};
+	prop_cntrl {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "prop_cntrl";
+			row1    = <0>;
+			row2    = <1>;
+			bit_high= <29>;
+			bit_low = <24>;
+	};
+	int_cntrl {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "int_cntrl";
+			row1    = <0>;
+			row2    = <1>;
+			bit_high= <23>;
+			bit_low = <18>;
+	};
+	gmp_cntrl {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "gmp_cntrl";
+			row1    = <0>;
+			row2    = <1>;
+			bit_high= <17>;
+			bit_low = <16>;
+	};
+	cpbias_cntrl {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "cpbias_cntrl";
+			row1    = <0>;
+			row2    = <1>;
+			bit_high= <15>;
+			bit_low = <10>;
+	};
+	dts_trim@3 {
+			compatible = "intel,mnh_efuse";
+			dtnode = "/thermal-zones/lpddr";
+			dtprop = "dts_trim";
+			row1    = <0>;
+			row2    = <1>;
+			bit_high= <9>;
+			bit_low = <0>;
+	};
+	dts_valid {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "testprop";
+			row1    = <2>;
+			row2    = <3>;
+			bit_high= <31>;
+			bit_low = <31>;
+	};
+	ps {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "testprop";
+			row1    = <2>;
+			row2    = <3>;
+			bit_high= <30>;
+			bit_low = <30>;
+	};
+	dts_trim@2 {
+			compatible = "intel,mnh_efuse";
+			dtnode = "/thermal-zones/cpu";
+			dtprop = "dts_trim";
+			row1    = <2>;
+			row2    = <3>;
+			bit_high= <29>;
+			bit_low = <20>;
+	};
+	dts_trim@1 {
+			compatible = "intel,mnh_efuse";
+			dtnode = "/thermal-zones/ipu2";
+			dtprop = "dts_trim";
+			row1    = <2>;
+			row2    = <3>;
+			bit_high= <19>;
+			bit_low = <10>;
+	};
+	dts_trim@0 {
+			compatible = "intel,mnh_efuse";
+			dtnode = "/thermal-zones/ipu1";
+			dtprop = "dts_trim";
+			row1    = <2>;
+			row2    = <3>;
+			bit_high= <9>;
+			bit_low = <0>;
+	};
+	hvqk {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "hvqk";
+			row1    = <4>;
+			row2    = <5>;
+			bit_high= <30>;
+			bit_low = <30>;
+	};
+	pcie_phyfw_patch {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "pcie_phyfw_patch";
+			row1    = <4>;
+			row2    = <5>;
+			bit_high= <29>;
+			bit_low = <29>;
+	};
+	pcie_devid {
+			compatible = "intel,mnh_efuse";
+			//dtnode = "/testnode@0";
+			dtprop = "pcie_devid";
+			row1    = <4>;
+			row2    = <5>;
+			bit_high= <28>;
+			bit_low = <24>;
+	};
+	wafer_upper {
+			compatible = "intel,mnh_efuse";
+			dtnode = "/chosen";
+			dtprop = "wafer_upper";
+			row1    = <4>;
+			row2    = <5>;
+			bit_high= <23>;
+			bit_low = <0>;
+	};
+	wafer_lower {
+			compatible = "intel,mnh_efuse";
+			dtnode = "/chosen";
+			dtprop = "wafer_lower";
+			row1    = <6>;
+			row2    = <7>;
+			bit_high= <31>;
+			bit_low = <0>;
+	};
+
+	/* scu configuration for power optimization */
+	scu_config {
+		compatible = "intel,mnh_cfg_scu";
+		rstc = <0x0FB51000>;
+		/* remove now to enable full speed clk */
+		/* ccu_clk_ctl = <0xA1FF5C63>; */
+		peripheral_clk_ctl = <0x0000604A>;
+		mem_pwr_mgmnt = <0x0200c500>;
+
+		global_wake_en_set0 = <0xEFFE28FC>;
+		global_wake_en_set1 = <0x08020783>;
+	};
+};

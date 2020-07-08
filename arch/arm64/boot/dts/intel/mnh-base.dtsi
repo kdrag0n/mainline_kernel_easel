@@ -1,0 +1,326 @@
+	timer {
+		compatible = "arm,armv8-timer";
+		interrupts = <GIC_PPI 13 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 14 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 11 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>,
+			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(6) | IRQ_TYPE_LEVEL_LOW)>;
+	};
+
+	apb_timer {
+		compatible = "snps,dw-apb-timer";
+		interrupts = <GIC_SPI 39 IRQ_TYPE_LEVEL_HIGH>;
+		reg = <0x0 0x04041000 0x0 0x10>;
+		clocks = <&soc_refclk100mhz>;
+		clock-frequency = <100000000>;
+	};
+	apb_clocksource {
+		compatible = "snps,dw-apb-timer";
+		reg = <0x0 0x04041028 0x0 0x10>;
+		clocks = <&soc_refclk100mhz>;
+		clock-frequency = <100000000>;
+	};
+	/include/ "mnh-clocks.dtsi"
+	/*
+	for everyone's sake, lets put the blocks in address order,
+	unless there is some reason not to
+	*/
+/*
+*	mnh-timer {
+*		compatible = "mnh-timer";
+*		reg = <0x0 0x04041014 0x0 0x1000>,
+*		      <0x0 0x04003000 0x0 0x1000>;
+*	};
+*/
+	dma0: dma@04000000 {
+		status = "disabled";
+		compatible = "snps,dma-spear1340";
+		reg = <0 0x04000000 0 0x1000>;
+		interrupts = <GIC_SPI 29 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 30 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
+		is_memcpy;
+		dma-channels = <4>;
+		dma-requests = <16>;
+		dma-masters = <1>;
+		#dma-cells = <3>;
+		chan_allocation_order = <1>;
+		chan_priority = <1>;
+		block_size = <0xfff>;
+		data_width = <2>;
+		clocks = <&soc_refclk100mhz>;
+	};
+
+	memory@40000000 {
+		device_type = "memory";
+		reg = <0x00000000 0x40080000 0x0 0x1FF80000>;
+	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		carveout_reserved: carveout_heap@4E800000 {
+			compatible = "ion-region";
+			reg = <0x0 0x49000000 0x0 0x17000000>;
+		};
+	};
+
+	paintbox@0400C000 {
+		compatible = "uio_pdrv_genirq", "google,paintbox";
+		reg = <0x0 0x0400C000 0x0 0xFFFF>;
+		interrupts = <GIC_SPI 1 IRQ_TYPE_LEVEL_HIGH>;
+		hardware-id = <0x0 0x6>;
+		status = "okay";
+	};
+
+	easel-ion@0 {
+		compatible = "easel,ion";
+
+		ion-carveout {
+			compatible = "easel,carveout";
+			memory-region = <&carveout_reserved>;
+		};
+
+		ion-system-heap {
+			compatible = "easel,sys_user";
+		};
+
+		ion-system-contig-heap {
+			compatible = "easel,sys_contig";
+		};
+
+		ion-cma {
+			compatible = "easel,cma";
+		};
+	};
+
+	mipi_tx0: mipidevice@04010000 {
+		compatible = "snps,mipicsi_device";
+		reg = <0x0 0x04010000 0x0 0xFFF>;
+		interrupts = <GIC_SPI 2 IRQ_TYPE_LEVEL_HIGH>;
+		device-id = "TX0";
+	};
+
+	mipi_tx1: mipidevice@04011000 {
+		compatible = "snps,mipicsi_device";
+		reg = <0x0 0x04011000 0x0 0xFFF>;
+                interrupts = <GIC_SPI 3 IRQ_TYPE_LEVEL_HIGH>;
+		device-id = "TX1";
+	};
+
+	mipi_rx0: mipihost@04012000 {
+		compatible = "snps,mipicsi_host";
+		reg = <0x0 0x04012000 0x0 0xFFF>;
+		interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
+		device-id = "RX0";
+	};
+
+	mipi_rx1: mipihost@04013000 {
+		compatible = "snps,mipicsi_host";
+		reg = <0x0 0x04013000 0x0 0xFFF>;
+		interrupts = <GIC_SPI 5 IRQ_TYPE_LEVEL_HIGH>;
+		device-id = "RX1";
+	};
+
+	mipi_rx2: mipihost@04014000 {
+		compatible = "snps,mipicsi_host";
+		reg = <0x0 0x04014000 0x0 0xFFF>;
+		interrupts = <GIC_SPI 6 IRQ_TYPE_LEVEL_HIGH>;
+		device-id = "RX2";
+	};
+
+	mipitop: mipitop@04015000 {
+		compatible = "intel,mipicsi_top";
+		reg = <0x0 0x04015000 0x0 0x0FFF>;
+		interrupts = <GIC_SPI 7 IRQ_TYPE_LEVEL_HIGH>;
+		device-id = "TOP";
+	};
+
+	spi@04043000 {
+		compatible = "snps,dw-apb-ssi";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0x0 0x04043000 0x0 0x1000>;
+		interrupts = <GIC_SPI 47 IRQ_TYPE_LEVEL_HIGH>;
+		num-cs = <4>;
+		clocks = <&soc_refclk100mhz>;
+		bus-num = <0>;
+		status = "disabled";
+		spidev@0 {
+			compatible = "spidev";
+			spi-max-frequency = <50000000>;
+			reg = <0>;
+		};
+	};
+
+	gpio@04044000 {
+		compatible = "snps,dw-apb-gpio";
+		reg = <0x0 0x04044000 0x0 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 52 IRQ_TYPE_LEVEL_HIGH>;
+		porta:  gpio-controller@0 {
+			compatible = "snps,dw-apb-gpio-port";
+			gpio-controller;
+			#gpio-cells = <2>;
+			snps,nr-gpios = <16>;
+			reg = <0>;
+			interrupt-controller;
+			interrupt-parent = <&gic>;
+		};
+	};
+
+	i2c0@04045000 {
+		compatible = "snps,designware-i2c";
+		reg = <0x0 0x04045000 0x0 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 43 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <100000>;
+		i2c-sda-hold-time-ns = <500>;
+		clocks = <&soc_refclk100mhz>;
+		status = "disabled";
+	};
+
+	i2c1@04046000 {
+		compatible = "snps,designware-i2c";
+		reg = <0x0 0x04046000 0x0 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 44 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <100000>;
+		i2c-sda-hold-time-ns = <500>;
+		clocks = <&soc_refclk100mhz>;
+		status = "disabled";
+	};
+
+	i2c2@04047000 {
+		compatible = "snps,designware-i2c";
+		reg = <0x0 0x04047000 0x0 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 45 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <100000>;
+		i2c-sda-hold-time-ns = <500>;
+		clocks = <&soc_refclk100mhz>;
+		status = "disabled";
+	};
+
+	i2c3@04048000 {
+		compatible = "snps,designware-i2c";
+		reg = <0x0 0x04048000 0x0 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 46 IRQ_TYPE_LEVEL_HIGH>;
+		clock-frequency = <100000>;
+		i2c-sda-hold-time-ns = <500>;
+		clocks = <&soc_refclk100mhz>;
+		status = "disabled";
+	};
+
+	soc_uart0: uart@04049000 {
+		compatible = "snps,dw-apb-uart";
+		reg = <0x0 0x04049000 0x0 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&soc_refclk100mhz>;
+		reg-shift = <2>;
+		reg-io-width = <4>;
+		dcd-override;
+		ri-override;
+	};
+
+	soc_uart1: uart@0404a000 {
+		status = "disabled";
+		compatible = "snps,dw-apb-uart";
+		reg = <0x0 0x0404a000 0x0 0x1000>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		interrupts = <GIC_SPI 50 IRQ_TYPE_LEVEL_HIGH>;
+		clocks = <&soc_refclk100mhz>;
+		reg-shift = <2>;
+		reg-io-width = <4>;
+		dcd-override;
+		ri-override;
+	};
+
+	perfmon@0404C000 {
+		compatible = "intel, perf_mon";
+		reg = <0x0 0x0404C000 0x0 0x1000>,
+			  <0x0 0x04003000 0x0 0x1000>;
+		interrupts = <GIC_SPI 12 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	soc_thermal: thermal@40030000 {
+		compatible = "intel, mnh_thermal";
+		reg = <0x0 0x4003000 0x0 0x1000>;
+		precision = <1>;
+		pvt-trip-data = <677>; /* 100000 millicelsius */
+		#thermal-sensor-cells = <1>;
+	};
+
+	freq_cooling: freq_cooling@40030000 {
+		compatible = "intel, mnh_freq_cooling";
+		reg =	<0x0 0x04003000 0x0 0x1000>,
+			<0x0 0x04008000 0x0 0x1000>,
+			<0x0 0x04004000 0x0 0x1000>;
+		interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
+		refclk-gpio = <0x1f3>;
+	};
+
+	pcie@041C2000 {
+		compatible = "snps, dw_pcie_ep";
+		reg = <0x0 0x00200000 0x0 0x2000>,
+			  <0x0 0x040C0000 0x0 0x1000>,
+			  <0x0 0x80000000 0x0 0x80000000>,
+			  <0x0 0x04003000 0x0 0x1000>;
+		interrupts = <GIC_SPI 25 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>,
+				<GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>;
+	};
+
+	thermal-zones {
+		ipu1 {
+			dts_trim = <0>;
+			polling-delay-passive = <1000>;/* milliseconds */
+			polling-delay = <0>;/* milliseconds */
+			thermal-sensors = <&soc_thermal 0>;
+		};
+
+		ipu2 {
+			dts_trim = <0>;
+			polling-delay-passive = <1000>;/* milliseconds */
+			polling-delay = <0>;/* milliseconds */
+			thermal-sensors = <&soc_thermal 1>;
+		};
+
+		cpu {
+			dts_trim = <0>;
+			polling-delay-passive = <1000>;/* milliseconds */
+			polling-delay = <0>;/* milliseconds */
+			thermal-sensors = <&soc_thermal 2>;
+		};
+
+		lpddr {
+			dts_trim = <0>;
+			polling-delay-passive = <1000>;/* milliseconds */
+			polling-delay = <0>;/* milliseconds */
+			thermal-sensors = <&soc_thermal 3>;
+		};
+	};
+
+	/* TODO(b/32513841): This is a fake cma device just for register trace testing purpose. */
+	paintbox_cma {
+		compatible = "google,paintbox_cma";
+		status = "disabled";
+	};
+
+	mnh_pm@40030000 {
+		compatible = "intel, mnh_pm";
+		reg = <0x0 0x04044000 0x0 0x1000>;
+		interrupts = <GIC_SPI 52 IRQ_TYPE_EDGE_RISING>;
+	};
+
