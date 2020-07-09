@@ -22,7 +22,7 @@
 	};
 
 	chosen {
-		bootargs = "loglevel=4 clocksource=apb_clocksource swiotlb=4096 console=ttyS0,115200n8 earlycon=uart8250,mmio32,0x04049000";
+		bootargs = "clocksource=apb_clocksource swiotlb=4096 console=ttyS0,115200n8 earlycon=uart8250,mmio32,0x04049000";
 		linux,initrd-start = <0x40890040>;
 		linux,initrd-end = <0x41C90000>;
 		stdout-path = "serial0:115200n8";
