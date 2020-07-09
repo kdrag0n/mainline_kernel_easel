@@ -899,13 +899,30 @@ CC_FLAGS_LTO_CLANG += -fvisibility=default
 LD_FLAGS_LTO_CLANG := -mllvm -import-instr-limit=5
 KBUILD_LDFLAGS += $(LD_FLAGS_LTO_CLANG)
 
-KBUILD_LDS_MODULE += $(srctree)/scripts/module-lto.lds
+KBUILD_LDS_MODULE += scripts/module-lto.lds
 endif
 
 ifdef CONFIG_LTO
 CC_FLAGS_LTO	:= $(CC_FLAGS_LTO_CLANG)
 KBUILD_CFLAGS	+= $(CC_FLAGS_LTO)
 export CC_FLAGS_LTO
+endif
+
+ifdef CONFIG_CFI_CLANG
+CC_FLAGS_CFI	:= -fsanitize=cfi \
+		   -fsanitize-cfi-cross-dso \
+		   -fno-sanitize-cfi-canonical-jump-tables \
+		   -fno-sanitize-blacklist
+
+ifdef CONFIG_CFI_PERMISSIVE
+CC_FLAGS_CFI	+= -fsanitize-recover=cfi \
+		   -fno-sanitize-trap=cfi
+endif
+
+# If LTO flags are filtered out, we must also filter out CFI.
+CC_FLAGS_LTO	+= $(CC_FLAGS_CFI)
+KBUILD_CFLAGS	+= $(CC_FLAGS_CFI)
+export CC_FLAGS_CFI
 endif
 
 # arch Makefile may override CC so keep this after arch Makefile is included
