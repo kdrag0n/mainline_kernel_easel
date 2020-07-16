@@ -237,13 +237,13 @@ firmware_config {
 	/* scu configuration for power optimization */
 	scu_config {
 		compatible = "intel,mnh_cfg_scu";
-		rstc = <0x0FB51000>;
+		rstc = <0x0fb51000>;
 		/* remove now to enable full speed clk */
 		/* ccu_clk_ctl = <0xA1FF5C63>; */
-		peripheral_clk_ctl = <0x0000604A>;
+		peripheral_clk_ctl = <0x0000604a>;
 		mem_pwr_mgmnt = <0x0200c500>;
 
-		global_wake_en_set0 = <0xEFFE28FC>;
+		global_wake_en_set0 = <0xeffe28fc>;
 		global_wake_en_set1 = <0x08020783>;
 	};
 };
